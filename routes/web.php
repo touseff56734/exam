@@ -45,6 +45,10 @@ Route::post('/addqna','TestController@getqna');
 Route::post('/import','TestController@import')->name('importQnA');
 Route::get('/all-std','TestController@allstd');
 Route::post('/add-std','TestController@addstd');
+//qna exam routing
+// qna exams rounting
+Route::get('/get-questions','TestController@getQuestions')->name('getQuestions');
+Route::post('/add-questions','TestController@addQuestions')->name('addQuestions');
 
 
 
@@ -53,3 +57,4 @@ Route::get('/test',function(){
    // dd($collection->toArray());
     dd($collection->toJson());
 });
+

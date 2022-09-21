@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Answer;
 use App\Question;
+use App\QnaExam;
 use App\Imports\QnaImport;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
@@ -131,4 +132,46 @@ class TestController extends Controller
         'msg' => 'successfully'
        ]);
     }
+
+    public function getQuestions(Request $request){
+      
+        try {
+          //  dd('okk');
+            $questions = Question::all();
+            $data = [];
+            $counter=0;
+            if (count($questions)>0 ) {
+              foreach($questions as $question){
+              $qnaExam = QnaExam::where(['exam_id'=>$request->exam_id,'question_id'=>$question->id])->get();
+              if ( count($qnaExam) == 0 ) { 
+                $data[$counter]['id'] =$question->id ;
+                $data[$counter]['question'] = $question->question;
+                $counter++;
+                }
+              }
+              return response()->json(['success' => true , 'msg' =>' Questions data!' , 'data' => $data]);
+
+            }
+          
+            else {
+                return response()->json(['success'=>false , 'msg' => 'Questions not Found!']) ;
+            }
+         } 
+        catch (\Excetion $e ) {
+            return response()->json(['success'=>false , 'msg'=> $e->getMessage()]) ;
+    }
+    
+   }
+   public function addQuestions(Request $request){
+       //dd($request->all());
+       if(isset($request->questions_ids)){
+           foreach($request->questions_ids as $qid){
+              QnaExam::insert([
+                'exam_id' => $request->exam_id,
+                'question_id' => $qid 
+              ]);
+           }
+       }
+       return back();
+   }
 }

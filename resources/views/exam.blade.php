@@ -62,7 +62,7 @@
             <td>{{ $exam->name }}</td>
             <td>{{ $exam->subject->name }}</td>
             <td>{{ $exam->attempt }}</td>
-            <td><a href="#" data-id="{{ $exam->id }}" data-toggle="modal" data-target="#addExams">Add Questions</a></td>
+            <td><a href="#" class="addQuestion" data-id="{{ $exam->id }}" data-toggle="modal" data-target="#addExams">Add Questions</a></td>
             <td>{{ $exam->exam_date }}</td>
             <td>{{ $exam->time }}</td>
             <!-- <td>{{ $exam->created_at->diffForHumans() }}</td> -->
@@ -80,7 +80,7 @@
 
          <!-- Modal content-->
          <div class="modal-content">
-            <form action="" id="" >
+            <form action="" id="addQna" >
                <div class="modal-header">
                <h4 class="modal-title">Add QnA</h4>
                   <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -88,11 +88,23 @@
                </div>
 
                <div class="modal-body">
-                  <input type="hidden" name="exam_id" >
-                  <select name="questions" multiple multiselect-search="true"  multiselect-select-all="true" onchange="console.log(this.selectedOptions)">
+                  <input type="hidden" name="exam_id" id="addExamId">
+                  <input type="search" type="search" class="w-100" placeholder="Search Here">
+                   <br><br>
+                   <table class="table">
+                     <thead>
+                        <th>Select</th>
+                        <th>Question</th>
+                     </thead>
+                     <tbody class="addBody">
+
+                     </tbody>
+                   </table>
+
+                  <!-- <select name="questions" multiple multiselect-search="true"  multiselect-select-all="true" onchange="console.log(this.selectedOptions)">
                      <option value="">asd</option>
                      <option value="a">aa</option>
-                  </select>
+                  </select> -->
                </div>
                <div class="modal-footer">
                   <button type="submit" class="btn btn-success">Add QnA</button>
@@ -138,5 +150,64 @@
          })
 
       })
+      //add qna exam
+
+      $('.addQuestion').click(function(){
+         var exam_id = $(this).data('id');
+         $('#addExamId').val(exam_id);
+
+         $.ajax({
+            url: "{{ route('getQuestions') }}",
+            type: "GET",
+            data: {exam_id : exam_id},
+            success: function(data){
+               if(data.success == true){
+                   var questions = data.data;
+                   var html = '';
+                   if(questions.length > 0){
+                      for(let i=0; i<questions.length; i++){
+                        html += `<tr>
+                                 <td><input type='checkbox' value="`+questions[i]['id']+`" name="questions_ids[]"></td>
+                                 <td>`+questions[i]['question']+`</td>
+                                 </tr>`;
+                      }
+
+                      
+                   }
+                   else {
+                     html += `<tr><td colspan='2'>Question Not found</td></tr>`
+                   }
+                   $(".addBody").html(html);
+               }
+               else{
+                  alert(data.msg);
+               }
+            }
+         })
+
+      })
+
+      //add qna
+
+      $('#addQna').submit(function(e) {
+         e.preventDefault();
+         var form = $(this).serialize();
+         // alert(form);
+         $.ajax({
+            url: '{{ route("addQuestions") }}',
+            data: form,
+            type: 'POST',
+            success: function(data) {
+               if (data == 1) {
+                  alert('Data has been inserted');
+               }
+            },
+            error: function(err) {
+               console.log(err);
+            }
+         })
+
+      })
+
    });
 </script>
