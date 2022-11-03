@@ -174,4 +174,15 @@ class TestController extends Controller
        }
        return back();
    }
+
+   public function email(){
+
+     $data= ['name'=>'touseef', 'data'=>'hello touseef'];
+    $user['to'] = 'touseef@astutesol.com';
+
+      Mail::send('mail',$data, function($message) use ($user){
+           $message->to($user['to']);
+           $message->subject('Hello Dev');
+      });
+   }
 }
